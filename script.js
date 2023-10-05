@@ -3,7 +3,7 @@ const typesCount = 18;
 const cardArea = document.getElementById("pokemon-container");
 
 const colors = {
-	fire: "#FDDFDF",
+	fire: "#FDDFDF", // Array com cores para definir o background para cada tipo de pokemon.
 	grass: "#DEFDE0",
 	electric: "#FCF7DE",
 	water: "#DEF3FD",
@@ -26,6 +26,7 @@ const colors = {
 const typesPoke = Object.keys(colors);
 
 const getPokemons = async (id) => {
+	// Puxa os dados dos pokemons por "id" ou "name" e retorna seus dados na createPokemonCard()
 	const URL = `https://pokeapi.co/api/v2/pokemon/${id}`;
 	const resp = await fetch(URL);
 	const data = await resp.json();
@@ -33,12 +34,14 @@ const getPokemons = async (id) => {
 };
 
 const fetchPokemons = async () => {
+	// Cria um looping para retornar todos os "id" de "pokemonCount" para "getPokemons()"
 	for (let i = 1; i <= pokemonCount; i++) {
 		await getPokemons(i);
 	}
 };
 
 const createPokemonCard = (poke) => {
+	// Cria o card de cada pokemon buscado tanto por 'type' tanto pela barra de pesquisa.
 	const card = document.createElement("div");
 	card.classList.add("cardInfo");
 
@@ -63,6 +66,7 @@ const createPokemonCard = (poke) => {
 };
 
 const getTypes = async (idTypes) => {
+	// Busca na api todos os 'types' dos pokemons e retorna todos os pokemons de cada tipo
 	const urlFilter = `https://pokeapi.co/api/v2/type/${idTypes}`;
 	const resp = await fetch(urlFilter);
 	const data = await resp.json();
@@ -71,11 +75,14 @@ const getTypes = async (idTypes) => {
 };
 
 const fetchTypes = async () => {
+	// Cria um looping para acessar cada 'type' que existe na API.
 	for (let i = 1; i <= typesCount; i++) {
 		await getTypes(i);
 	}
 };
+
 const createTypesFilter = (type) => {
+	// Cria os itens do select para filtrar os 'types'
 	const select = document.getElementById("types");
 	const createOption = document.createElement("option");
 	createOption.value = type.id;
@@ -83,37 +90,37 @@ const createTypesFilter = (type) => {
 	select.appendChild(createOption);
 };
 
-const requisitionByFilter = async (id) => {
-	const idTypes = String(id || "");
-	const URL = `https://pokeapi.co/api/v2/type/${idTypes}`;
+const filterByType = async (id) => {
+	//Acessa a API pelo o 'id' de cada 'type'
+	const idTypes = String(id || ""); //e cria um looping para retornar cada nome de pokemon do tipo escolhido
+	const URL = `https://pokeapi.co/api/v2/type/${idTypes}`; //e manda para a function getPokemons() para criar os cards dos pokemons
 	const resp = await fetch(URL);
 	const data = await resp.json();
 	let idPoke;
-	for (i = 0; i <= 40; i++) {
+	for (i = 0; i <= 99; i++) {
 		idPoke = data.pokemon[i].pokemon.name;
 		getPokemons(idPoke);
 	}
 };
-
-const createCardByFilter = (data) => {};
-
-const select = document.getElementById("types");
-select.addEventListener("change", async () => {
+const select = document.getElementById("types"); // Reseta a tela toda vez que mudar o filtro dos pokemons.
+const handleTypeFilter = async () => {
 	const selectType = select.value;
 	if (selectType !== "types") {
-		requisitionByFilter(selectType);
+		filterByType(selectType);
 		cardArea.innerHTML = "";
 	} else {
 		cardArea.innerHTML = "";
-		fetchPokemons();
+		await fetchPokemons();
 	}
-});
-
-fetchTypes();
+};
+select.addEventListener("change", handleTypeFilter);
 
 window.addEventListener("DOMContentLoaded", async () => {
+	// Faz rodar a function principal para que possa ver os pokemons na tela inicial.
 	const option = document.getElementById("option-id");
 	if (option.value === "types") {
 		await fetchPokemons();
 	}
 });
+
+fetchTypes();
