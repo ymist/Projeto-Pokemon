@@ -1,6 +1,7 @@
 const pokemonCount = 10;
 const typesCount = 18;
 const cardArea = document.getElementById("pokemon-container");
+const input = document.getElementById("search-poke");
 
 const colors = {
 	fire: "#FDDFDF", // Array com cores para definir o background para cada tipo de pokemon.
@@ -70,7 +71,6 @@ const getTypes = async (idTypes) => {
 	const urlFilter = `https://pokeapi.co/api/v2/type/${idTypes}`;
 	const resp = await fetch(urlFilter);
 	const data = await resp.json();
-	console.log(data.name);
 	createTypesFilter(data);
 };
 
@@ -91,13 +91,15 @@ const createTypesFilter = (type) => {
 };
 
 const filterByType = async (id) => {
-	//Acessa a API pelo o 'id' de cada 'type'
-	const idTypes = String(id || ""); //e cria um looping para retornar cada nome de pokemon do tipo escolhido
-	const URL = `https://pokeapi.co/api/v2/type/${idTypes}`; //e manda para a function getPokemons() para criar os cards dos pokemons
+	/*Acessa a API pelo o 'id' de cada 'type' e cria um looping 
+	para retornar cada nome de pokemon do tipo escolhido 
+	e manda para a function getPokemons() para criar os cards dos pokemons */
+	const idTypes = String(id || ""); //
+	const URL = `https://pokeapi.co/api/v2/type/${idTypes}`;
 	const resp = await fetch(URL);
 	const data = await resp.json();
 	let idPoke;
-	for (i = 0; i <= 99; i++) {
+	for (i = 0; i <= 50; i++) {
 		idPoke = data.pokemon[i].pokemon.name;
 		getPokemons(idPoke);
 	}
@@ -105,6 +107,7 @@ const filterByType = async (id) => {
 const select = document.getElementById("types"); // Reseta a tela toda vez que mudar o filtro dos pokemons.
 const handleTypeFilter = async () => {
 	const selectType = select.value;
+	input.value = "";
 	if (selectType !== "types") {
 		filterByType(selectType);
 		cardArea.innerHTML = "";
@@ -114,7 +117,6 @@ const handleTypeFilter = async () => {
 	}
 };
 select.addEventListener("change", handleTypeFilter);
-
 window.addEventListener("DOMContentLoaded", async () => {
 	// Faz rodar a function principal para que possa ver os pokemons na tela inicial.
 	const option = document.getElementById("option-id");
@@ -124,3 +126,52 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 fetchTypes();
+
+// Barra de pesquisa
+
+const searchPoke = () => {
+	cardArea.innerHTML = "";
+	const searchInput = input.value.toLowerCase();
+	const currentUrl = window.location.href.split("?")[0];
+	const newUrl = `${currentUrl}?search=${searchInput}`;
+	window.history.pushState({ searchReverted: true }, null, newUrl);
+
+	console.log(newUrl);
+	getPokemons(searchInput);
+};
+
+input.addEventListener("keyup", (e) => {
+	if (e.key === "Enter") {
+		searchPoke();
+	}
+});
+
+const revertSearch = () => {
+	input.value = "";
+	searchPoke();
+
+	if (select === "types") {
+		fetchPokemons();
+	} else {
+		handleTypeFilter();
+	}
+	console.log(input.value);
+};
+window.addEventListener("popstate", (e) => {
+	if (e.state && e.state.searchReverted) {
+		revertSearch();
+	}
+});
+
+const autoCompleteInput = document.getElementById("autocomplete");
+const autocomplete = (item) => {
+	const itemList = `
+	<li>
+	<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${item}.png"
+	alt="" />
+	<span></span>
+	</li>`;
+	console.log(itemList);
+};
+
+autocomplete();

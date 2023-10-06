@@ -8,7 +8,19 @@
 		<title>Pokedex App</title>
 	</head>
 	<body>
-		<h1 class="title-page">Pokedex</h1>
+		<header class="navbar">
+			<input type="text" class="search-poke" id="search-poke" placeholder="Insira um Pokemon..." />
+			<div id="autocomplete">
+				<ul>
+					<li>
+						<img
+							src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/95.png"
+							alt="bulbasaur" />
+						<span>bulbasaur</span>
+					</li>
+				</ul>
+			</div>
+		</header>
 		<div class="filter-types">
 			<span>Types</span>
 			<select name="filterTypes" id="types">
