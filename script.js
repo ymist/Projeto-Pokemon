@@ -1,4 +1,4 @@
-const pokemonCount = 10;
+const pokemonCount = 150;
 const typesCount = 18;
 const cardArea = document.getElementById("pokemon-container");
 const input = document.getElementById("search-poke");
@@ -32,6 +32,7 @@ const getPokemons = async (id) => {
 	const resp = await fetch(URL);
 	const data = await resp.json();
 	createPokemonCard(data);
+	return data;
 };
 
 const fetchPokemons = async () => {
@@ -130,13 +131,12 @@ fetchTypes();
 // Barra de pesquisa
 
 const searchPoke = () => {
+	autoCompleteInput.innerHTML = "";
 	cardArea.innerHTML = "";
 	const searchInput = input.value.toLowerCase();
 	const currentUrl = window.location.href.split("?")[0];
 	const newUrl = `${currentUrl}?search=${searchInput}`;
 	window.history.pushState({ searchReverted: true }, null, newUrl);
-
-	console.log(newUrl);
 	getPokemons(searchInput);
 };
 
@@ -164,14 +164,46 @@ window.addEventListener("popstate", (e) => {
 });
 
 const autoCompleteInput = document.getElementById("autocomplete");
+
 const autocomplete = (item) => {
+	const cardList = document.createElement("ul");
+	const name = item.name[0].toUpperCase() + item.name.slice(1);
+	const id = item.id.toString().padStart(3, 0);
+	console.log(item);
+	const pokeTypes = item.types.map((type) => type.type.name);
+	const type = typesPoke.find((type) => pokeTypes.indexOf(type) > -1);
+	const color = colors[type];
+	cardList.style.backgroundColor = color;
+
 	const itemList = `
-	<li>
-	<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${item}.png"
-	alt="" />
-	<span></span>
-	</li>`;
-	console.log(itemList);
+				<li id="list-li">
+					<img
+						src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${item.id}.png"
+						alt="${name}" />
+					<div class="info-autocomplete">
+						<span class="number-autocomplete">${id}</span>
+						<span class="span-name">${name}</span>
+						<span class="span-type">${type}</span>
+					</div>
+				</li>`;
+	cardList.innerHTML = itemList;
+	autoCompleteInput.appendChild(cardList);
+	const listLi = document.getElementById("list-li");
+	listLi.addEventListener("click", () => {
+		searchPoke();
+	});
 };
 
-autocomplete();
+let timeoutId;
+input.addEventListener("input", async () => {
+	clearTimeout(timeoutId);
+	const inputTrim = input.value.trim();
+	if (inputTrim.length < 3) {
+		autoCompleteInput.innerHTML = "";
+		return;
+	}
+	timeoutId = setTimeout(async () => {
+		const results = await getPokemons(inputTrim.toLowerCase());
+		autocomplete(results);
+	}, 250);
+});
