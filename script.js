@@ -142,9 +142,17 @@ const searchPoke = () => {
 
 input.addEventListener("keyup", (e) => {
 	if (e.key === "Enter") {
+		e.preventDefault()
 		searchPoke();
+		autoCompleteInput.innerHTML = ''
+		input.value = ''
 	}
 });
+const searchBtn = document.getElementById('search-btn')
+
+searchBtn.addEventListener('click', ()=>{
+	searchPoke()
+})
 
 const revertSearch = () => {
 	input.value = "";
@@ -166,6 +174,7 @@ window.addEventListener("popstate", (e) => {
 const autoCompleteInput = document.getElementById("autocomplete");
 
 const autocomplete = (item) => {
+	autoCompleteInput.innerHTML =''
 	const cardList = document.createElement("ul");
 	const name = item.name[0].toUpperCase() + item.name.slice(1);
 	const id = item.id.toString().padStart(3, 0);
@@ -191,6 +200,7 @@ const autocomplete = (item) => {
 	const listLi = document.getElementById("list-li");
 	listLi.addEventListener("click", () => {
 		searchPoke();
+		listLi.style.display = 'none';
 	});
 };
 
@@ -203,7 +213,21 @@ input.addEventListener("input", async () => {
 		return;
 	}
 	timeoutId = setTimeout(async () => {
-		const results = await getPokemons(inputTrim.toLowerCase());
-		autocomplete(results);
+		const URL = `https://pokeapi.co/api/v2/pokemon/${inputTrim.toLowerCase()}`;
+		const resp = await fetch(URL);
+		const results = await resp.json();
+		console.log(resp.ok)
+		console.log(results)
+		if(resp.ok !== false){
+			autocomplete(results);
+		}
+		
 	}, 250);
 });
+
+document.addEventListener('click', (event) => {
+	if(!autoCompleteInput.contains(event.target)){
+		input.value = ''
+		autoCompleteInput.innerHTML = ''
+	}
+})
