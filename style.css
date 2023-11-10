@@ -21,17 +21,55 @@ body {
 	margin: 0 auto;
 	max-width: 1200px;
 }
+.card-flip{
+	width: 200px;
+	height: 300px;
+	margin: 20px;
+	background-color: transparent;
+	perspective: 500px;
+}
+
+.card-inner{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	transition: 0.8s;
+	transform-style: preserve-3d;
+}
 .cardInfo {
-	padding: 20px;
-	border-radius: 10px;
-	box-shadow: 0 3px 15px rgba(100, 100, 100, 0.5);
-	margin: 10px;
 	text-align: center;
 	display: flex;
 	align-items: center;
 	flex-direction: column;
-	width: 160px;
+	width: 170px;
+	height: 270px;
+	padding: 20px;
+	border-radius: 10px;
+	position: absolute;
+	backface-visibility: hidden;
+	z-index: 3;
 }
+.card-back{
+	text-align: center;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	width: 170px;
+	height: 270px;
+	padding: 20px;
+	border-radius: 10px;
+	position: absolute;
+	z-index: 2;
+}
+
+.card-flip:hover .card-inner{
+	transform: rotateY(-180deg);
+}
+
+.card-flip:hover .card-back{
+	transform: rotateY(-180deg);
+}
+
 .number {
 	font-size: 18px;
 	border-radius: 100px;
@@ -89,6 +127,7 @@ body {
 	justify-content: center;
 	align-items: center;
 	padding: 15px 0 10px 0px;
+	z-index: 10;
 }
 .search-poke {
 	height: 28px;

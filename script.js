@@ -32,6 +32,7 @@ const getPokemons = async (id) => {
 	const resp = await fetch(URL);
 	const data = await resp.json();
 	createPokemonCard(data);
+	console.log(data)
 	return data;
 };
 
@@ -44,8 +45,17 @@ const fetchPokemons = async () => {
 
 const createPokemonCard = (poke) => {
 	// Cria o card de cada pokemon buscado tanto por 'type' tanto pela barra de pesquisa.
-	const card = document.createElement("div");
-	card.classList.add("cardInfo");
+	const cardFlip = document.createElement("div")
+	cardFlip.classList.add("card-flip")
+
+	const cardInner = document.createElement("div")
+	cardInner.classList.add('card-inner')
+
+	const cardFront = document.createElement("div");
+	cardFront.classList.add("cardInfo");
+
+	const cardBack = document.createElement("div")
+	cardBack.classList.add('card-back')
 
 	const name = poke.name[0].toUpperCase() + poke.name.slice(1);
 	const id = poke.id.toString().padStart(3, 0);
@@ -53,18 +63,24 @@ const createPokemonCard = (poke) => {
 	const pokeTypes = poke.types.map((type) => type.type.name);
 	const type = typesPoke.find((type) => pokeTypes.indexOf(type) > -1);
 	const color = colors[type];
-	card.style.backgroundColor = color;
+	cardFront.style.backgroundColor = color;
+	cardBack.style.backgroundColor = color;
 
-	const pokemonInnerHtml = `
+	const pokemonFront = `
         <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${poke.id}.png" alt="${name}" class="imgCard">
         <span class="number">${id}</span>
         <div class="pokeInfo">
             <h3 class="titlePokemon">${name}</h3>
             <small class="type">Tipo: <span class="type-span">${type}</span></small>
         </div>`;
-	card.innerHTML = pokemonInnerHtml;
 
-	cardArea.appendChild(card);
+	cardFront.innerHTML = pokemonFront;
+	cardBack.innerHTML = ``
+
+	cardArea.appendChild(cardFlip)
+	cardFlip.appendChild(cardInner)
+	cardInner.appendChild(cardFront);
+	cardInner.appendChild(cardBack)
 };
 
 const getTypes = async (idTypes) => {
